@@ -14,6 +14,6 @@ ENV NAME asdasd
 
 COPY  . .
 
-#ENTRYPOINT ["python", "-u","./python-api/main.py"]
+#ENTRYPOINT ["python", "-u","./app/main.py"]
 
 CMD ["uvicorn", "python-api.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "80"]

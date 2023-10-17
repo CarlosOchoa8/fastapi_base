@@ -1,5 +1,4 @@
 from typing import Union
-import time
 from fastapi import FastAPI
 from pydantic import BaseModel
 
