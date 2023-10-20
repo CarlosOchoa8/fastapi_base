@@ -11,43 +11,57 @@ router = APIRouter()
 
 
 @router.post("/")
-def create_user(*,
-                db: Session = Depends(get_db),
-                user_in: schemas.UserCreateSchema):
+async def create_user(user_in: schemas.UserCreateSchema,
+                      db: Session = Depends(get_db)):
     if user := crud.user.get_by_email(db=db, email=user_in.email):
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                             detail=f'Ya se encuentra registrado el correo {user_in.email}')
+                             detail=f'Already exists a user with email {user.email}')
     try:
-        return crud.user.create(db=db, obj_in=user_in)
-    except Exception:
+        user_created = (crud.user.create(db=db, obj_in=user_in))
+        return schemas.UserResponseSchema(**user_created.__dict__)
+    except HTTPException:
         # raise Exception(e) from e
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                             detail='Ha ocurrido un error al intentar creal el usuario.')
-#
-#
-# @router.put('/{user_id}')
-# def update_user(db: Session,
-#                 user_id: int,
-#                 user_in: schemas.UserUpdateSchema):
-#     if user := crud.user.get(db=db, id=user_id):
-#         user_updated = crud.user.update(db=db, obj_in=user_in, db_obj=user)
-#
-#
-# @router.get('/')
-# def get_users(db: Session = Depends(get_db)):
-#     try:
-#         return crud.user.get_multi(db=db)
-#     except HTTPException as exception:
-#         return exception
+                             detail='Has been occurred a problem trying create the user.')
 
 
-# @router.get('/{user_id}', response_model=None)
-# def get_user(db: Session,
-#              user_id: int) -> dict | Any:
-#     if user := crud.user.get(db=db, id=user_id):
-#         return user
-#     return HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-#                          detail='Usuario no encontrado')
+@router.put('/{user_id}',
+            response_model=schemas.UserResponseSchema)
+def update_user(user_id: int,
+                user_in: schemas.UserUpdateSchema,
+                db: Session = Depends(get_db)):
+    if user_obj := crud.user.get(db=db, id=user_id):
+        try:
+            user_updated = crud.user.update(db=db, obj_in=user_in, db_obj=user_obj)
+            return schemas.UserResponseSchema(**user_updated.__dict__)
+        except HTTPException:
+            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                 detail='Has been occurred a problem trying create the user.')
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                         detail=f'User {user_id} does not exist.')
+
+
+@router.get('/',
+            response_model=schemas.UserResponseSchema)
+def get_users(db: Session = Depends(get_db)):
+    try:
+        user_objs = crud.user.get_multi(db=db)
+        return schemas.UserResponseSchema(**user_objs.__dict__)
+    except HTTPException:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                             detail='Has been occurred a problem getting users.')
+
+
+@router.get('/{user_id}',
+            response_model=schemas.UserResponseSchema)
+def get_user(user_id: int,
+             db: Session = Depends(get_db)) -> dict | Any:
+    try:
+        user_obj = crud.user.get(db=db, id=user_id)
+        return schemas.UserResponseSchema(**user_obj.__dict__)
+    except HTTPException:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                             detail='Has been occurred a problem getting user.')
 
 
 user_router = router

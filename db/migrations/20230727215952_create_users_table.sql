@@ -5,7 +5,8 @@ CREATE TABLE "user"
    first_name varchar(255) not null,
    last_name varchar(255) not null,
    email varchar(255) not null,
-   user_type varchar(255) not null
+   user_type varchar(255) not null,
+   phone_number varchar(13) not null
 );
 
 -- migrate:down

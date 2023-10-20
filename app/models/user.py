@@ -1,6 +1,5 @@
 from app.config.database.base_class import Base
 from sqlalchemy import Column, String, Integer
-from pydantic import Field
 
 
 class User(Base):
@@ -8,4 +7,5 @@ class User(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     email = Column(String, nullable=False)
+    phone_number = Column(Integer, nullable=False)
     user_type = Column(String, nullable=False)
