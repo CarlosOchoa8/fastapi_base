@@ -7,17 +7,21 @@ networks:
 services:
   e-learning-app:
     container_name: e-learning-app
-    image: e-learning
+    image: ${IMAGE_NAME}
     ports:
       - '80:80'
 #      - '443:443'
     build:
       context: .
       dockerfile: Dockerfile
+#    command: uvicorn src.main:app --host 0.0.0.0 --port 80 --reload --workers 4
+    command: uvicorn app.main:app --proxy-headers --host 0.0.0.0 --port 80 --reload
     networks:
       - e_learning_network
     volumes:
       - .:/usr/src/app
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_started
@@ -36,6 +40,17 @@ services:
       - "5432:5432"
     networks:
       - e_learning_network
+
+  migration:
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres?sslmode=disable
+    image: ${IMAGE_NAME}:latest
+    networks:
+      - e_learning_network
+    entrypoint: /bin/sh -c "dbmate wait && dbmate up"
+    depends_on:
+      - db
+
 
 volumes:
     db_data:

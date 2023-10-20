@@ -1,28 +1,15 @@
-from typing import Union
+from app.api.routers import api_router
 from fastapi import FastAPI
-from pydantic import BaseModel
 
-app = FastAPI()
+fastapi_app = FastAPI(
+    title='e-learning_api',
+    description='e-learning platform API',
+    swagger_ui_parameters={'docExpansion': 'None'}
+)
 
+fastapi_app.include_router(
+    router=api_router,
+    prefix='/api/v1'
+)
 
-class Item(BaseModel):
-    name: str
-    price: float
-    is_offer: Union[bool, None] = None
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
-@app.put("/items/{item_id}")
-def update_item(item_id: int, item: Item):
-    return {"item_name": item.name, "item_id": item_id}
-
-# time.sleep(999)
+app = fastapi_app

@@ -1,2 +1,7 @@
+# Byte-compiled / optimized / DLL files
 /.idea
 app/__pycache__/
+/__pycache__/
+__pycache__/
+*.py[cod]
+*$py.class
