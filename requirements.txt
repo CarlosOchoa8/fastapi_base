@@ -7,6 +7,9 @@ httptools==0.6.0
 idna==3.4
 pydantic==2.4.2
 pydantic_core==2.10.1
+pydantic[email]
+pydantic-extra-types==2.1.0
+pydantic-settings==2.0.3
 python-dotenv==1.0.0
 PyYAML==6.0.1
 sniffio==1.3.0
@@ -16,3 +19,5 @@ uvicorn==0.23.2
 uvloop==0.17.0
 watchfiles==0.20.0
 websockets==11.0.3
+sqlalchemy==2.0.19
+psycopg2-binary==2.9.9
